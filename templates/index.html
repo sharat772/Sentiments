@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sentiment Analysis of Educational Institutions</title>
+    <!-- Add the Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS for headings */
+        h1 {
+            font-family: 'Monaco', monospace;
+  color: #1e488f;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+        }
+      #headingmain{
+        /* max-width: 800px; */
+  /* margin: 120px; */
+  padding: 20px;
+  background-color:#e8e5d6;
+  /* border-radius: 8px; */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+        h3 {
+            font-family: 'Monaco', monospace;
+  color: #1e488f;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="headingmain">
+            <h1>Sentiment Analysis of Educational Institutions for Getting Admissions</h1>
+        </div>
+        
+
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="file">Upload Dataset:</label>
+                <input type="file" name="file" id="file" required class="form-control-file">
+            </div>
+            <input type="submit" value="Upload College Reviews Dataset" class="btn btn-secondary">
+        </form>
+
+        {% if college_list %}
+        <form action="/sentiment" method="post" class="mt-4">
+            <div class="form-group">
+                <label for="college_names">College Names:</label>
+                <select name="college_names" id="college_names" required class="form-control">
+                    {% for college in college_list %}
+                    <option value="{{ college }}">{{ college }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" value="Perform Sentiment Analysis" class="btn btn-secondary">
+            <!-- Add the hidden input field here -->
+            <input type="hidden" name="text_widget" value="">
+        </form>
+        {% endif %}
+
+        {% if result %}
+        <div class="mt-4">
+            <h3>Analysis Results:</h3>
+            <pre>{{ result }}</pre>
+        </div>
+        {% endif %}
+
+        {% if graph_image %}
+<h1 class="mt-4">College Admission Graph</h1>
+<img src="data:image/png;base64,{{ graph_image }}" alt="Admission Graph" class="img-fluid rounded" style="max-width: 40%;">
+{% endif %}
+
+    </div>
+
+    <!-- Add the Bootstrap JS and jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
