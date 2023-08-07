@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import io
 import base64
+from itertools import groupby
+from operator import itemgetter
 import matplotlib
 matplotlib.use('agg')
 app = Flask(__name__)
@@ -59,27 +61,106 @@ def processReviews(college_name):
         negative_percentage = 0
         neutral_percentage = 0
 
+    if total_reviews > 0:
+        average_rating = (positive_percentage - negative_percentage) / total_reviews * 100
+    else:
+        average_rating = 0
+
+    college_rank = get_college_rank(college_name)  # Get the rank of the college
+
     result = f"Selected College Name: {college}\n"
     result += f"Positive Reviews %: {positive_percentage:.2f}\n"
     result += f"Negative Reviews %: {negative_percentage:.2f}\n"
     result += f"Neutral Reviews %: {neutral_percentage:.2f}\n"
+    result += f"Average Rating: {average_rating:.2f}\n"
+    result += f"College Rank: {college_rank}\n"
 
-    return result, positive, negative, neutral
+    return result, positive, negative, neutral, average_rating, college_rank
 
 
 @app.route('/sentiment', methods=['POST'])
 def sentiment():
     global college_list, dataset
     college = request.form.get('college_names', '')
-    result, positive, negative, neutral = processReviews(college)
+    result, positive, negative, neutral, average_rating, college_rank = processReviews(college)
+
 
     graph_image = generate_graph(college, positive, negative, neutral)
 
-    # Check if the graph_image is not empty or None before rendering the template
     if graph_image:
-        return render_template('index.html', college_list=college_list, result=result, graph_image=graph_image)
+        return render_template('index.html', college_list=college_list, result=result, graph_image=graph_image, average_rating=average_rating)
     else:
-        return render_template('index.html', college_list=college_list, result=result)
+        return render_template('index.html', college_list=college_list, result=result, average_rating=average_rating)
+
+
+def generate_rankings():
+    global dataset, college_list
+    rankings = {}
+
+    for college in college_list:
+        selected_college = dataset.loc[dataset['college'] == college]
+        selected_college_reviews = selected_college['review'].tolist()
+        positive, negative, neutral = 0, 0, 0
+
+        for review in selected_college_reviews:
+            sentiment_dict = sid.polarity_scores(review)
+            compound = sentiment_dict['compound']
+            if compound >= 0.90:
+                positive += 1
+            elif compound >= 0.50 and compound < 0.90:
+                negative += 1
+            else:
+                neutral += 1
+
+        total_reviews = len(selected_college_reviews)
+        if total_reviews > 0:
+            positive_percentage = (positive / total_reviews) * 100
+            negative_percentage = (negative / total_reviews) * 100
+            neutral_percentage = (neutral / total_reviews) * 100
+        else:
+            positive_percentage = 0
+            negative_percentage = 0
+            neutral_percentage = 0
+
+        if total_reviews > 0:
+            average_rating = (positive_percentage - negative_percentage) / total_reviews * 100
+        else:
+            average_rating = 0
+
+        rankings[college] = (average_rating, total_reviews, positive, negative, neutral)
+
+    # Sort the colleges based on the average rating, total reviews, and positive reviews (in that order)
+    sorted_rankings = sorted(rankings.items(), key=lambda item: (item[1][0], item[1][1], item[1][2]), reverse=True)
+
+    # Group colleges with the same ranking factors and assign the same rank
+    ranked_colleges = []
+    rank = 1
+    for idx, (college, ranking_factors) in enumerate(sorted_rankings):
+        if idx > 0 and ranking_factors < sorted_rankings[idx - 1][1]:
+            rank = idx + 1
+        ranked_colleges.append((rank, college, *ranking_factors))
+
+    return ranked_colleges
+
+
+def get_college_rank(college_name):
+    ranked_colleges = generate_rankings()
+    for rank, college, *_ in ranked_colleges:
+        if college == college_name:
+            return rank
+    return None
+
+@app.route('/rankings', methods=['GET'])
+def rankings():
+    ranked_colleges = generate_rankings()
+    return render_template('rankings.html', ranked_colleges=ranked_colleges)
+
+
+def do_enumerate(iterable, start=1):
+    return enumerate(iterable, start)
+
+# Register the custom filter
+app.jinja_env.filters['enumerate'] = do_enumerate
 
 
 def sentimentAnalysis():

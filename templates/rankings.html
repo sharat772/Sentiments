@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Rankings</title>
+    <!-- Add the Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        h1 {
+            font-family: 'Monaco', monospace;
+            color: #1e488f;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        </br></br>
+        <br></br>
+        <h1>College Rankings by Average Rating and Review Sentiments</h1>
+        <br></br>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Rank</th>
+                    <th>College Name</th>
+                    <!-- <th>Average Rating</th>
+                    <th>Total Reviews</th>
+                    <th>Positive Reviews</th>
+                    <th>Negative Reviews</th>
+                    <th>Neutral Reviews</th> -->
+                </tr>
+            </thead>
+            <tbody class="thead-light">
+                {% for rank, college, average_rating, total_reviews, positive_reviews, negative_reviews, neutral_reviews in ranked_colleges %}
+                <tr>
+                    <td>{{ rank }}</td>
+                    <td>{{ college }}</td>
+                    <!-- <td>{{ (average_rating/1000)/2 }}</td>
+                    <td>{{ total_reviews }}</td>
+                    <td>{{ positive_reviews }}</td>
+                    <td>{{ negative_reviews }}</td>
+                    <td>{{ neutral_reviews }}</td> -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add the Bootstrap JS and jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

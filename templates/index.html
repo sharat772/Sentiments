@@ -61,17 +61,21 @@
         </form>
         {% endif %}
 
-        {% if result %}
+        {% if average_rating %}
         <div class="mt-4">
             <h3>Analysis Results:</h3>
             <pre>{{ result }}</pre>
         </div>
-        {% endif %}
+    {% endif %}
 
         {% if graph_image %}
 <h1 class="mt-4">College Admission Graph</h1>
 <img src="data:image/png;base64,{{ graph_image }}" alt="Admission Graph" class="img-fluid rounded" style="max-width: 40%;">
 {% endif %}
+
+<div class="mt-4">
+    <a href="/rankings" class="btn btn-secondary">View All Colleges Rankings</a>
+</div>
 
     </div>
 
