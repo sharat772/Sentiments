@@ -72,7 +72,7 @@ def processReviews(college_name):
     result += f"Positive Reviews %: {positive_percentage:.2f}\n"
     result += f"Negative Reviews %: {negative_percentage:.2f}\n"
     result += f"Neutral Reviews %: {neutral_percentage:.2f}\n"
-    result += f"Average Rating: {average_rating:.2f}\n"
+    result += f"Average Rating %: {average_rating/100}\n"
     result += f"College Rank: {college_rank}\n"
 
     return result, positive, negative, neutral, average_rating, college_rank
